@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\MemberResource\Pages;
+use App\Filament\Resources\MemberResource\RelationManagers;
+use App\Models\Member;
+use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\Form;
+use Filament\Resources\Resource;
+use Filament\Resources\Table;
+use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+class MemberResource extends Resource
+{
+    protected static ?string $model = Member::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-user-add';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->columns(1)
+            ->schema([
+                TextInput::make('nama')->required(),
+                TextInput::make('no_hp')->label('phone')->required(),
+                DatePicker::make('tanggal')->required()
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('nama')->searchable(),
+                TextColumn::make('no_hp')->label('phone')->searchable(),
+                TextColumn::make('tanggal')->searchable(),
+                TextColumn::make('point')->searchable()
+            ])
+            ->filters([
+                //
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
+            ]);
+    }
+    
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ManageMembers::route('/'),
+        ];
+    }    
+}
