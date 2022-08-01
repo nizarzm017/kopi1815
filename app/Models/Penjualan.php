@@ -14,11 +14,23 @@ class Penjualan extends Model
     static $non_cash = 2;
     static $point = 3;
 
+    static $member = 1;
+    static $non_member = 2;
+
     public function user(){
         return $this->belongsTo(User::class);
     }
+
+    public function menu(){
+        return $this->belongsTo(Menu::class);
+    }
+
     public function member(){
         return $this->belongsTo(Member::class);
+    }
+
+    public function penjualan_detail(){
+        return $this->hasMany(PenjualanDetail::class);
     }
 
     static function no_transaksi(){

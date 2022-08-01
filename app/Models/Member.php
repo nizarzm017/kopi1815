@@ -21,4 +21,8 @@ class Member extends Model
     {
         return $this->point()->sum('point') >= static::$min; 
     }
+
+    public function penjualan(){
+        return $this->hasMany(Penjualan::class);
+    }
 }

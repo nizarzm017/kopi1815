@@ -13,15 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('pembelian_detail', function (Blueprint $table) {
-            $table->id();
-            $table->integer('pembelian_id');
-            $table->integer('item_id');
-            $table->integer('qty');
-            $table->integer('harga');
-            $table->integer('subtotal');
-            $table->timestamps();
-        });
+        Schema::table('menu', function($table){
+            $table->enum('kategori', ['makanan', 'minuman']);
+        });    
     }
 
     /**
@@ -31,6 +25,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pembelian_detail');
+        //
     }
 };

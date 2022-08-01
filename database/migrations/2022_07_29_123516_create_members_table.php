@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('nama');
             $table->string('no_hp');
             $table->date('tanggal');
-            $table->integer('point')->nullable();
             $table->timestamps();
         });
     }
