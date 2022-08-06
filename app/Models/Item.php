@@ -11,6 +11,6 @@ class Item extends Model
     protected $guarded = [];
 
     public function pembelian_detail(){
-        return $this->hasOne(PembelianDetail::class);
+        return $this->hasMany(PembelianDetail::class);
     }
 }

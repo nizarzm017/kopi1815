@@ -40,7 +40,8 @@ class MemberResource extends Resource
                 TextColumn::make('nama')->searchable(),
                 TextColumn::make('no_hp')->label('phone')->searchable(),
                 TextColumn::make('tanggal')->searchable(),
-                TextColumn::make('point')->searchable()
+                TextColumn::make('point_sum_point')->sum('point', 'point')->label("Total Point"),
+ 
             ])
             ->filters([
                 //

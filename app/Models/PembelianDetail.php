@@ -14,4 +14,8 @@ class PembelianDetail extends Model
     public function pembelian(){
         return $this->belongsTo(Pembelian::class);
     }
+
+    public function item(){
+        return $this->belongsTo(Item::class);
+    }
 }

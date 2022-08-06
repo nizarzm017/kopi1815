@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use Akaunting\Money\Money;
+use App\Enums\KategoriEnum;
 use App\Filament\Resources\PenjualanResource\Pages;
 use App\Filament\Resources\PenjualanResource\RelationManagers;
 use App\Models\Member;
@@ -11,8 +12,12 @@ use App\Models\Penjualan;
 use Closure;
 use Illuminate\Support\Str;
 use Filament\Forms;
+use Filament\Forms\ComponentContainer;
+use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -23,6 +28,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -53,18 +59,20 @@ class PenjualanResource extends Resource
                         ->required(),
                     DatePicker::make('tanggal')
                         ->default(date('Y-m-d'))
-                        ->required(),
+                        ->required()
+                        ->disabled(),
                     Select::make('user_id')->relationship('user', 'name')->default(auth()->user()->id)->disabled(),
                     Radio::make('is_member')
                         ->label('Pembeli')
                         ->options([
-                            Penjualan::$non_member  => 'Tidak Member',
                             Penjualan::$member      => 'Member',
+                            Penjualan::$non_member  => 'Tidak Member',
                         ])
                         ->default(Penjualan::$non_member)
                         ->reactive(),
                     Select::make('member_id')
-                        ->relationship(Penjualan::$member, 'nama')
+                        ->relationship('member', 'nama')
+                        ->label('Nama')
                         ->searchable()
                         ->preload()
                         ->afterStateUpdated(function (Closure $set, $state){
@@ -78,10 +86,12 @@ class PenjualanResource extends Resource
                         ->hidden(fn (Closure $get) => $get('is_member') == Penjualan::$member),
                     TextInput::make('point')
                         ->disabled()
+                        ->default(0)
+                        ->afterStateHydrated(function (Closure $set, Closure $get, $state, ?Penjualan $record){
+                            $set('point', Member::find($get('member_id'))?->point()->where('created_at', '<', $record->created_at)->sum('point'));
+                        })
                         // ini kd tahu kenapa jadi tebalik lh cari tahu sorang
-                        ->hidden(fn (Closure $get) => $get('is_member') == Penjualan::$non_member)
-                        
-                            
+                        ->hidden(fn (Closure $get) => $get('is_member') == Penjualan::$non_member)                          
                 ]),
 
                 Section::make('Detail')
@@ -100,7 +110,6 @@ class PenjualanResource extends Resource
                                     ->afterStateUpdated(function (Closure $set, $state){
                                         $set('harga', Str::slug(Menu::find($state)->harga));
                                         $set('subtotal', Str::slug(Menu::find($state)->harga));
-                                        $set('../../total', Str::slug(Menu::find($state)->harga));
                                     }),
                                 TextInput::make('harga')
                                     ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
@@ -115,14 +124,26 @@ class PenjualanResource extends Resource
                                     ->afterStateUpdated(function (Closure $set, Closure $get, $state){
                                         $subtotal = Str::slug($state * $get('harga'));
                                         $set('subtotal', $subtotal);
-                                        $set('../../total', Str::slug(($get('../i/subtotal') + $subtotal)));
                                     }),
                                 TextInput::make('subtotal')
                                     ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
+                                    ->reactive()
                                     ->disabled()
-                                    
-                            ])
-                    ]),
+                            ])    
+                            ->createItemButtonLabel('Add Item'),
+                            Card::make()
+                            ->schema([
+                                Placeholder::make('total')
+                                    ->content(function ($get, $set){
+                                    $total = 0;
+                                    foreach($get('penjualan_detail') as $data) {
+                                        $total += (int)$data['subtotal'];
+                                    }
+                                    $set('total', Str::slug($total));
+                                    return Str::slug($total);
+                                    })
+                                ])
+                            ]),
                 Section::make('Pembayaran')
                     ->columns(2)
                     ->schema([
@@ -136,9 +157,21 @@ class PenjualanResource extends Resource
                             ->afterStateUpdated(function (Closure $set, Closure $get, $state) {
                                 
                                 if ((int) $state == Penjualan::$point && $get('is_member') == Penjualan::$member) {
-                                    $member = Member::find($get('member_id'));
+                                    $member             = Member::find($get('member_id'));
+                                    $details            = $get('penjualan_detail');
+                                    $jumlah_pembelian   = collect($details)->sum('qty');
                                     
-                                    if ( !empty($member) && $member->isPoint()) {
+                                    if ($member->isPoint($jumlah_pembelian)) {
+                                        foreach ($details as $detail) {
+                                            $menu = Menu::find((int)$detail['menu_id']);
+                                            if ($menu->kategori == KategoriEnum::makanan()) {
+                                                Notification::make()
+                                                ->title('Point hanya bisa membeli minuman')
+                                                ->warning()
+                                                ->send();
+                                                return $set('pembayaran', Penjualan::$cash);
+                                            }
+                                        }
                                         $set('pembayaran', $state);
                                     } else {
                                         $set('pembayaran', Penjualan::$cash);
@@ -147,6 +180,7 @@ class PenjualanResource extends Resource
                                             ->warning()
                                             ->send();
                                     }
+
                                 }
 
                                 if ($get('is_member') == Penjualan::$non_member && $state == Penjualan::$point) {
@@ -160,6 +194,7 @@ class PenjualanResource extends Resource
                             ->default(Penjualan::$cash),
                         TextInput::make('total')
                             ->required()
+                            ->default(0)
                             ->disabled()
                             ->reactive()
                             ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
@@ -170,15 +205,15 @@ class PenjualanResource extends Resource
                             ->reactive()
                             ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
                             ->afterStateUpdated(function (Closure $set, Closure $get, $state){
-                                $set('kembalian', Str::slug($get('total') - $state));
+                                $set('kembalian', Str::slug($state - $get('total')));
                             })
                             ->hidden(fn (Closure $get) => (int)$get('pembayaran') !== Penjualan::$cash),
                         TextInput::make('kembalian')
                             ->required()
                             ->disabled()
                             ->reactive()
-                            ->default(0)
                             ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
+                            ->default(0)
                             ->hidden(fn (Closure $get) => (int)$get('pembayaran') !== Penjualan::$cash),
                     ])
             ]);
@@ -188,7 +223,11 @@ class PenjualanResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('no_transaksi'),
+                TextColumn::make('user.name'),
+                TextColumn::make('tanggal'),
+                TextColumn::make('penjualan_detail_sum_qty')->sum('penjualan_detail', 'qty')->label("Kuantitas"),
+                TextColumn::make('total')
             ])
             ->filters([
                 //
