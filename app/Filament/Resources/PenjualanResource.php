@@ -98,17 +98,17 @@ class PenjualanResource extends Resource
                         ->disabled()
                         ->default(0)
                         ->afterStateHydrated(function (Closure $set, Closure $get, $state, ?Penjualan $record){
-                            $set(
-                                'point',
-                                $record?->member()->point()->where('created_at', '<', $record->created_at)->sum('point')
-                            );
                             // $set(
-                            //     'point', 
-                            //     Member::find($get('member_id'))
-                            //         ?->point()
-                            //         ->where('created_at', '<', $record->created_at)
-                            //         ->sum('point')
-                            //     );
+                            //     'point',
+                            //     $record?->member()?->point()->where('created_at', '<', $record->created_at)->sum('point')
+                            // );
+                            $set(
+                                'point', 
+                                Member::find($get('member_id'))
+                                    ?->point()
+                                    ->where('created_at', '<', $record->created_at)
+                                    ->sum('point')
+                                );
                         })
                         // ini kd tahu kenapa jadi tebalik lh cari tahu sorang
                         ->hidden(fn (Closure $get) => $get('is_member') == Penjualan::$non_member)                          
@@ -234,7 +234,15 @@ class PenjualanResource extends Resource
                             ->afterStateUpdated(function (Closure $set, Closure $get, $state){
                                 $set('kembalian', Str::slug($state - $get('total')));
                             })
-                            ->hidden(fn (Closure $get) => (int)$get('pembayaran') !== Penjualan::$cash),
+                            ->hidden(fn (Closure $get) => (int)$get('pembayaran') !== Penjualan::$cash)
+                            ->rules([function(Closure $get){
+                                function($state, Closure $fail) use ($get){
+                                if ($state < $get('bayar') ) {
+                                    $fail("Pembayaran Kurang");
+                                }
+                            };
+                            },
+                            ]),
                         TextInput::make('kembalian')
                             ->required()
                             ->disabled()

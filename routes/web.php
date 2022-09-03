@@ -15,3 +15,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('penjualan/nota/{penjualan}', Nota::class)->name('nota');
+
+// Route::redirect('/login', '/admin/login')->name('login');

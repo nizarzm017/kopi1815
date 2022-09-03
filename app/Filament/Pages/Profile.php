@@ -2,68 +2,23 @@
 
 namespace App\Filament\Pages;
 
+use Filament\Facades\Filament;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Pages\Page;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
+use RyanChandler\FilamentProfile\Pages\Profile as PagesProfile;
 
-class Profile extends Page implements HasForms
+class Profile extends PagesProfile
 {
-    use InteractsWithForms;
-
-    protected static ?string $navigationIcon = 'heroicon-o-user';
-
-    protected static ?string $navigationGroup = 'Account';
-
-    protected static string $view = 'filament-profile::filament.pages.profile';
-
-    public $name;
-
-    public $email;
-
-    public $current_password;
-
-    public $new_password;
-
-    public $new_password_confirmation;
-
-    public function mount()
+    public function getFormModel(): Model | string | null
     {
-        $this->form->fill([
-            'name' => auth()->user()->name,
-            'email' => auth()->user()->email,
-        ]);
-    }
-
-    public function submit()
-    {
-        $this->form->getState();
-
-        $state = array_filter([
-            'name' => $this->name,
-            'email' => $this->email,
-            'password' => $this->new_password ? Hash::make($this->new_password) : null,
-        ]);
-
-        auth()->user()->update($state);
-
-        $this->reset(['current_password', 'new_password', 'new_password_confirmation']);
-        $this->notify('success', 'Your profile has been updated.');
-    }
-
-    public function getCancelButtonUrlProperty()
-    {
-        return static::getUrl();
-    }
-
-    protected function getBreadcrumbs(): array
-    {
-        return [
-            url()->current() => 'Profile',
-        ];
+        return Filament::auth()->user();
     }
 
     protected function getFormSchema(): array

@@ -178,7 +178,7 @@
                     </td>
                     <td width="100%">
                         <p style="text-align:right;">
-                            {{ $penjualan->member_point->point }}
+                            {{ $penjualan->member_point->point ?? 0 }}
                         </p>
                     </td>
                 </tr>
