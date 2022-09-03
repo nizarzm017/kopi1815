@@ -11,7 +11,7 @@ class MemberPoint extends Model
     protected $guarded  = [];
      
     public function penjualan(){
-        return $this->hasOne(Penjualan::class);
+        return $this->belongsTo(Penjualan::class);
     }
 
     public function member()

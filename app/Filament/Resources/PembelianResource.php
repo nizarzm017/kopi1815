@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\PembelianResource\Pages;
 use App\Filament\Resources\PembelianResource\RelationManagers;
 use App\Models\Item;
@@ -23,6 +24,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -36,9 +38,11 @@ class PembelianResource extends Resource
 
     protected static ?string $pluralLabel = 'Pembelian';
 
+    protected static ?string $navigationGroup = 'Transaksi';
+
     protected static ?string $navigationLabel = 'Pembelian';
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'tabler-shopping-cart-plus';
 
     public static function form(Form $form): Form
     {
@@ -124,10 +128,20 @@ class PembelianResource extends Resource
     {
         return $table
             ->columns([
-                
+                TextColumn::make('no_transaksi'),
+                TextColumn::make('user.name'),
+                TextColumn::make('tanggal'),
+                TextColumn::make('pembelian_detail_sum_qty')->sum('pembelian_detail', 'qty')->label("Kuantitas"),
+                TextColumn::make('total')
             ])
             ->filters([
-                //
+
+            ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('Cetak Laporan')
+                    ->extraViewData([
+                        'title' => 'Pembelian'
+                    ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -151,5 +165,7 @@ class PembelianResource extends Resource
             'create' => Pages\CreatePembelian::route('/create'),
             'edit' => Pages\EditPembelian::route('/{record}/edit'),
         ];
-    }    
+    }  
+    
+
 }

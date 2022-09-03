@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -32,7 +33,7 @@ class Penjualan extends Model
     }
 
     public function member_point(){
-        return $this->belongsTo(MemberPoint::class);
+        return $this->hasOne(MemberPoint::class);
     }
 
     public function penjualan_detail(){
@@ -84,8 +85,30 @@ class Penjualan extends Model
         return str_pad(
          $number , 5, '0' , STR_PAD_LEFT
         );
-        
-
     }
 
+    static function getSumByDate() {
+        $month  = date('m');
+        $year   = date('Y');
+        $query  = self::select('id')->whereMonth('created_at', $month)->whereYear('created_at', $year);
+        return $query;
+    }
+
+    static function getTransaksiByDate() {
+        $month  = date('m');
+        $year   = date('Y');
+        $query  = self::select('*')->whereMonth('created_at', $month)->whereYear('created_at', $year);
+        return $query;
+    }
+
+    static function getBestSeller(){
+        $today      = Carbon::now();
+        $firstDay   = $today->firstOfMonth();
+        $ids        = static::whereBetween('created_at', [$firstDay, $today])->pluck('id');
+        $query      = PenjualanDetail::selectRaw('id, menu_id, count(qty) as jumlah')->groupBy('menu_id')->whereIn('penjualan_id', $ids);
+        // $ids        = self::whereColumn('id', $ids);
+        // $query      = PenjualanDetail::select('barang_id')->select(PenjualanDetail::raw('count(qty) as jumlah, qty'))->whereIn('transaksi_id', $ids)->groupBy('barang_id')->orderByDesc('jumlah')->get();
+
+        return $query;
+    }
 }

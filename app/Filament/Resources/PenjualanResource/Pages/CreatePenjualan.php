@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PenjualanResource\Pages;
 
 use App\Filament\Resources\PenjualanResource;
+use App\Models\Penjualan;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,10 +14,10 @@ class CreatePenjualan extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         unset($data['point']);
-
-        $create = $this->getModel()::create($data);
-        
-        return $create;
+        if ($data['pembayaran'] != Penjualan::$cash) {
+            $data['bayar'] = $data['total'];
+        }
+        return$this->getModel()::create($data);
     }
 
     protected function afterCreate(): void
@@ -24,5 +25,8 @@ class CreatePenjualan extends CreateRecord
         $point = $this->record->addPoint();
     }
 
-
+    protected function getRedirectUrl(): string
+    {
+        return route('nota', ['penjualan' => $this->record]);
+    }
 }
