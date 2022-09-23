@@ -23,6 +23,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -124,7 +125,10 @@ class PembelianResource extends Resource
     {
         return $table
             ->columns([
-                
+                TextColumn::make('no_transaksi'),
+                TextColumn::make('tanggal'),
+                TextColumn::make('pembelian_detail_sum_qty')->sum('pembelian_detail', 'qty')->label("Kuantitas"),
+                TextColumn::make('total')
             ])
             ->filters([
                 //

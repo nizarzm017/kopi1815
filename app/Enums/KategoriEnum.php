@@ -9,7 +9,7 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self minuman()
  */
 
- class KategoriEnum extends Enum 
+ class KategoriEnum extends Enum
  {
 
     public static function kategori(): array
