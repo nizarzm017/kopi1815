@@ -128,14 +128,16 @@ class PembelianResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('no_transaksi'),
+                TextColumn::make('no_transaksi')
+                    ->sortable(),
                 TextColumn::make('user.name'),
                 TextColumn::make('tanggal'),
                 TextColumn::make('pembelian_detail_sum_qty')->sum('pembelian_detail', 'qty')->label("Kuantitas"),
                 TextColumn::make('total')
             ])
+            ->defaultSort('no_transaksi', 'desc')
             ->filters([
-
+                
             ])
             ->headerActions([
                 FilamentExportHeaderAction::make('Cetak Laporan')

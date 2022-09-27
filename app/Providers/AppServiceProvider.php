@@ -29,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
         Filament::registerNavigationGroups([
             'Data Master',
             'Transaksi',
+            'Laporan',
             'Account',
             'Filament Shield',
         ]);

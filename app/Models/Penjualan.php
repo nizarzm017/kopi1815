@@ -103,12 +103,19 @@ class Penjualan extends Model
 
     static function getBestSeller(){
         $today      = Carbon::now();
-        $firstDay   = $today->firstOfMonth();
-        $ids        = static::whereBetween('created_at', [$firstDay, $today])->pluck('id');
-        $query      = PenjualanDetail::selectRaw('id, menu_id, count(qty) as jumlah')->groupBy('menu_id')->whereIn('penjualan_id', $ids);
-        // $ids        = self::whereColumn('id', $ids);
-        // $query      = PenjualanDetail::select('barang_id')->select(PenjualanDetail::raw('count(qty) as jumlah, qty'))->whereIn('transaksi_id', $ids)->groupBy('barang_id')->orderByDesc('jumlah')->get();
-
+        $firstDay   = Carbon::now()->firstOfMonth();
+        $query      = PenjualanDetail::whereBetween('created_at', [$firstDay, $today])->selectRaw('id, menu_id, count(qty) as jumlah')->groupBy('menu_id');
         return $query;
     }
+
+    static function getAllBestSeller(){
+        $query      = PenjualanDetail::selectRaw('id, menu_id, count(qty) as jumlah')->groupBy('menu_id');
+        return $query;
+    }
+
+    static function getTotalPenjualan($dari, $sampai){
+        $query = self::whereBetween('created_at', [$dari, $sampai])->sum('total');
+        return $query;
+    }
+
 }

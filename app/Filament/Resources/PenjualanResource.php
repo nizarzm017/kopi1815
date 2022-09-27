@@ -236,8 +236,9 @@ class PenjualanResource extends Resource
                             })
                             ->hidden(fn (Closure $get) => (int)$get('pembayaran') !== Penjualan::$cash)
                             ->rules([function(Closure $get){
-                                function($state, Closure $fail) use ($get){
-                                if ($state < $get('bayar') ) {
+                                $bayar = $get('bayar');
+                                function($state, Closure $fail) use ($bayar){
+                                if ($state < $bayar ) {
                                     $fail("Pembayaran Kurang");
                                 }
                             };
@@ -258,12 +259,17 @@ class PenjualanResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('no_transaksi'),
+                TextColumn::make('no_transaksi')
+                    ->sortable(),
                 TextColumn::make('user.name'),
-                TextColumn::make('tanggal'),
+                TextColumn::make('created_at')
+                    ->label('Tanggal')
+                    ->sortable()
+                    ->date(),
                 TextColumn::make('penjualan_detail_sum_qty')->sum('penjualan_detail', 'qty')->label("Kuantitas"),
                 TextColumn::make('total')
             ])
+            ->defaultSort('no_transaksi', 'desc')
             ->filters([
                 SelectFilter::make('is_member')
                     ->options([
