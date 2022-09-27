@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Filament\Pages;
+
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Pages\Page;
+
+class LabaRugi extends Page implements HasForms
+{
+    
+    use InteractsWithForms;
+
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+
+    protected static string $view = 'filament.pages.laba-rugi';
+
+    protected static ?string $navigationGroup = 'Laporan';
+
+}

@@ -52,7 +52,9 @@ class UserResource extends Resource
                     ->type('password')
                     ->required()
                     ->dehydrated(false),
-                    MultiSelect::make('roles')->relationship('roles', 'name')->label('Roles'),
+                    MultiSelect::make('roles')->relationship('roles', 'name')
+                        ->label('Roles')
+                        ->preload(),
                 ])
             ]);
     }

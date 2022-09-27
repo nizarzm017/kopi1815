@@ -11,10 +11,10 @@ class Role extends SpatieRole
 {
     use HasFactory;
     
-    public const SUPER_ADMIN = 'super_admin';
-    public const OWNER = 'owner';
-    public const KASIR = 'kasir';
-    public const STAFF = 'staff';
+    public const SUPER_ADMIN  = 'super_admin';
+    public const OWNER        = 'owner';
+    public const KASIR        = 'kasir';
+    public const STAFF        = 'staff';
 
     public static function getRoles(): array
     {

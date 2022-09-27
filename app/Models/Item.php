@@ -9,4 +9,8 @@ class Item extends Model
 {
     use HasFactory;
     protected $guarded = [];
+
+    public function pembelian_detail(){
+        return $this->hasMany(PembelianDetail::class);
+    }
 }

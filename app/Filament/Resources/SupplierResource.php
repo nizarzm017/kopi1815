@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\SupplierResource\Pages;
 use App\Filament\Resources\SupplierResource\RelationManagers;
 use App\Models\Supplier;
@@ -20,7 +21,9 @@ class SupplierResource extends Resource
 {
     protected static ?string $model = Supplier::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationGroup = 'Data Master';
+
+    protected static ?string $navigationIcon = 'bi-truck';
 
     public static function form(Form $form): Form
     {
@@ -41,8 +44,14 @@ class SupplierResource extends Resource
                 TextColumn::make('no_hp')->label('Phone')->searchable(),
                 TextColumn::make('alamat')->searchable(),
             ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('Cetak Laporan')
+                    ->extraViewData([
+                        'title' => 'Supplier'
+                    ])
+            ])
             ->filters([
-                //
+                
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

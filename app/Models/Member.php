@@ -17,8 +17,17 @@ class Member extends Model
         return $this->hasMany(MemberPoint::class);
     }
 
-    public function isPoint()
+    public function isPoint($jumlah_pembelian)
     {
-        return $this->point()->sum('point') >= static::$min; 
+        return $this->point()->sum('point') >= (static::$min * $jumlah_pembelian); 
+    }
+
+    // public function getPointbeforeDate()
+    // {
+    //     return $this->point()->whereDate('created_at', '<', )->sum('point'); 
+    // }
+
+    public function penjualan(){
+        return $this->hasMany(Penjualan::class);
     }
 }

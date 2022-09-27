@@ -11,8 +11,8 @@ class Pegawai extends Model
     protected $table    = 'pegawai';
     protected $guarded  = [];
 
-    static $jenis_kelamin   = array('Laki-laki', 'Perempuan');
-    static $status_perkawinan  = array('Belum Nikah', 'Nikah');
-    static $agama           = array('Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu');
-    static $jabatan         = array('Owner', 'Staff', 'Kasir', 'Admin', 'Staff Kitchen');
+    static $jenis_kelamin       = array('Laki-laki', 'Perempuan');
+    static $status_perkawinan   = array('Belum Nikah', 'Nikah');
+    static $agama               = array('Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu');
+    static $jabatan             = array('Owner', 'Staff', 'Kasir', 'Admin', 'Staff Kitchen');
 }

@@ -25,15 +25,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Filament::registerStyles([
-            asset('css/app.css'),
+        
+        Filament::registerNavigationGroups([
+            'Data Master',
+            'Transaksi',
+            'Laporan',
+            'Account',
+            'Filament Shield',
         ]);
-        // Filament::serving(function () {
-        //     // Using Vite
-        //     Filament::registerTheme(
-        //         app(Vite::class)('resources/css/app.css'),
-        //     );
-        // });
+        Filament::serving(function () {
+            // Using Vite
+            Filament::registerTheme(
+                app(Vite::class)('resources/css/filament.css'),
+            );
+        });
         
     }
 }

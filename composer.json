@@ -6,14 +6,21 @@
     "license": "MIT",
     "require": {
         "php": "^8.0.2",
+        "alperenersoy/filament-export": "^0.1.5",
         "bezhansalleh/filament-shield": "^2.1",
+        "blade-ui-kit/blade-heroicons": "^1.3",
+        "davidhsianturi/blade-bootstrap-icons": "^1.3",
         "filament/filament": "^2.0",
         "filament/notifications": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^2.14.1",
         "laravel/tinker": "^2.7",
-        "ryangjchandler/filament-profile": "^0.2.0"
+        "mallardduck/blade-boxicons": "^2.3",
+        "ryangjchandler/blade-tabler-icons": "^1.3",
+        "ryangjchandler/filament-profile": "^0.2.0",
+        "spatie/laravel-enum": "^3.0",
+        "troccoli/blade-health-icons": "^0.3.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

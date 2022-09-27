@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\MemberResource\Pages;
 use App\Filament\Resources\MemberResource\RelationManagers;
 use App\Models\Member;
@@ -19,6 +20,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class MemberResource extends Resource
 {
     protected static ?string $model = Member::class;
+
+    protected static ?string $navigationGroup = 'Data Master';
 
     protected static ?string $navigationIcon = 'heroicon-o-user-add';
 
@@ -40,10 +43,17 @@ class MemberResource extends Resource
                 TextColumn::make('nama')->searchable(),
                 TextColumn::make('no_hp')->label('phone')->searchable(),
                 TextColumn::make('tanggal')->searchable(),
-                TextColumn::make('point')->searchable()
+                TextColumn::make('point_sum_point')->sum('point', 'point')->label("Total Point"),
+ 
             ])
             ->filters([
-                //
+                
+            ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('Cetak Laporan')
+                    ->extraViewData([
+                        'title' => 'Member'
+                    ])    
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
