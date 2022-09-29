@@ -49,6 +49,7 @@ class MenuResource extends Resource
                     ->required(),
                 Radio::make('kategori')
                     ->options(KategoriEnum::kategori())
+                    ->required()
             ]);
     }
 

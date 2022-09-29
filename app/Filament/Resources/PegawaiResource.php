@@ -45,7 +45,7 @@ class PegawaiResource extends Resource
                 DatePicker::make('tanggal_lahir')->required(),
                 Select::make('agama')->options(Pegawai::$agama)->required(),
                 Textarea::make('alamat')->required(),
-                TextInput::make('no_hp')->required(),
+                TextInput::make('no_hp')->required()->numeric(),
                 Select::make('status_perkawinan')->options(Pegawai::$status_perkawinan)->required(),
                 Select::make('jabatan')->options(pegawai::$jabatan)->required(),
                 DatePicker::make('mulai_bekerja')->required()

@@ -6,6 +6,7 @@ use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\MemberResource\Pages;
 use App\Filament\Resources\MemberResource\RelationManagers;
 use App\Models\Member;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
@@ -30,9 +31,15 @@ class MemberResource extends Resource
         return $form
             ->columns(1)
             ->schema([
-                TextInput::make('nama')->required(),
-                TextInput::make('no_hp')->label('phone')->required(),
-                DatePicker::make('tanggal')->required()
+                TextInput::make('nama')
+                    ->required(),
+                TextInput::make('no_hp')
+                    ->label('phone')
+                    ->numeric()
+                    ->required(),
+                DatePicker::make('tanggal')
+                    ->default(Carbon::now())
+                    ->required()
             ]);
     }
 

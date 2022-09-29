@@ -28,8 +28,11 @@ class ItemResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('kode'),
-                TextInput::make('nama'),
+                TextInput::make('kode')
+                    ->required()
+                    ->unique(),
+                TextInput::make('nama')
+                    ->required(),
             ]);
     }
 

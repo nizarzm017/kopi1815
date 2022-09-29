@@ -30,6 +30,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -125,20 +126,23 @@ class PenjualanResource extends Resource
                                     ->relationship('menu', 'nama')
                                     ->searchable()
                                     ->preload()
-                                    ->required()
                                     ->reactive()
                                     ->afterStateUpdated(function (Closure $set, $state){
-                                        $set('harga', Str::slug(Menu::find($state)->harga));
-                                        $set('subtotal', Str::slug(Menu::find($state)->harga));
+                                        $cekState = is_null($state);
+                                        if ($cekState) {
+                                            $set('harga', Str::slug(0));
+                                            $set('subtotal', Str::slug(0));
+                                        }else{
+                                            $set('harga', Str::slug(Menu::find($state)->harga));
+                                            $set('subtotal', Str::slug(Menu::find($state)->harga));
+                                        }
                                     }),
                                 TextInput::make('harga')
                                     ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
                                     ->reactive()
-                                    ->disabled()
-                                    ->required(),
+                                    ->disabled(),
                                 TextInput::make('qty')
                                     ->numeric()
-                                    ->required()
                                     ->default(1)
                                     ->reactive()
                                     ->afterStateUpdated(function (Closure $set, Closure $get, $state){
@@ -271,11 +275,22 @@ class PenjualanResource extends Resource
             ])
             ->defaultSort('no_transaksi', 'desc')
             ->filters([
-                SelectFilter::make('is_member')
-                    ->options([
-                        Penjualan::$member => 'Member',
-                        Penjualan::$non_member => 'Bukan Member'
+                Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from')->label('Dari'),
+                        Forms\Components\DatePicker::make('created_until')->label('Sampai'),
                     ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
             ])
             ->headerActions([
                 FilamentExportHeaderAction::make('Cetak Laporan')
