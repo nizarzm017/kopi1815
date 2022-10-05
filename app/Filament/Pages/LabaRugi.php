@@ -10,6 +10,7 @@ use Filament\Pages\Page;
 
 class LabaRugi extends Page implements HasForms
 {
+    use HasPageShield;
     
     use InteractsWithForms;
 
