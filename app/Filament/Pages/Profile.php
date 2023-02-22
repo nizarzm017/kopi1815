@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -16,6 +17,8 @@ use RyanChandler\FilamentProfile\Pages\Profile as PagesProfile;
 
 class Profile extends PagesProfile
 {
+    use HasPageShield;
+
     public function getFormModel(): Model | string | null
     {
         return Filament::auth()->user();

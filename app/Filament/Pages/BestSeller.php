@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class BestSeller extends Page implements HasTable
 {
+    use HasPageShield;
 
     use InteractsWithTable;
 
