@@ -127,6 +127,7 @@ class PenjualanResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->reactive()
+                                    ->required()
                                     ->afterStateUpdated(function (Closure $set, $state){
                                         $cekState = is_null($state);
                                         if ($cekState) {
@@ -269,8 +270,11 @@ class PenjualanResource extends Resource
                     ->label('Tanggal')
                     ->sortable()
                     ->date(),
-                TextColumn::make('penjualan_detail_sum_qty')->sum('penjualan_detail', 'qty')->label("Kuantitas"),
+                TextColumn::make('penjualan_detail_sum_qty')
+                    ->sum('penjualan_detail', 'qty')
+                    ->label("Kuantitas"),
                 TextColumn::make('total')
+                    ->money('idr', true)
             ])
             ->defaultSort('no_transaksi', 'desc')
             ->filters([
@@ -317,7 +321,7 @@ class PenjualanResource extends Resource
         return [
             'index' => Pages\ListPenjualans::route('/'),
             'create' => Pages\CreatePenjualan::route('/create'),
-            'edit' => Pages\EditPenjualan::route('/{record}/edit'),
+            // 'edit' => Pages\EditPenjualan::route('/{record}/edit'),
         ];
     }    
 }

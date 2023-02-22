@@ -78,6 +78,16 @@ class PembelianResource extends Resource
                                             ->relationship('item', 'nama')
                                             ->searchable()
                                             ->preload()
+                                            ->afterStateUpdated(function (Closure $set, $state){
+                                                $cekState = is_null($state);
+                                                if ($cekState) {
+                                                    $set('harga', Str::slug(0));
+                                                    $set('subtotal', Str::slug(0));
+                                                }else{
+                                                    $set('harga', Str::slug(Item::find($state)->harga));
+                                                    $set('subtotal', Str::slug(Item::find($state)->harga));
+                                                }
+                                            })
                                             ->required()
                                             ->reactive(),
                                         TextInput::make('harga')
@@ -96,7 +106,8 @@ class PembelianResource extends Resource
                                             ->afterStateUpdated(function (Closure $set, Closure $get, $state){
                                                 $subtotal = Str::slug($state * $get('harga'));
                                                 $set('subtotal', $subtotal);
-                                            }),
+                                            })
+                                            ->helperText('pcs/g'),
                                         TextInput::make('subtotal')
                                             ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
                                             ->lazy()
@@ -135,6 +146,7 @@ class PembelianResource extends Resource
                 TextColumn::make('tanggal'),
                 TextColumn::make('pembelian_detail_sum_qty')->sum('pembelian_detail', 'qty')->label("Kuantitas"),
                 TextColumn::make('total')
+                    ->money('idr', true)
             ])
             ->defaultSort('no_transaksi', 'desc')
             ->filters([

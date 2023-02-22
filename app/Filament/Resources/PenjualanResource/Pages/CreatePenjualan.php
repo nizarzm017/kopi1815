@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\PenjualanResource\Pages;
 
 use App\Filament\Resources\PenjualanResource;
+use App\Models\Item;
+use App\Models\Menu;
 use App\Models\Penjualan;
 use App\Models\PenjualanDetail;
 use Filament\Resources\Pages\CreateRecord;
@@ -25,6 +27,18 @@ class CreatePenjualan extends CreateRecord
     protected function afterCreate(): void
     {
         $point = $this->record->addPoint();
+        $datas = $this->record->penjualan_detail;
+        foreach($datas as $data){
+            $reseps = Menu::find($data->menu_id)->resep;
+            foreach ($reseps as $resep) {
+                $item = Item::find($resep->item_id);
+                $qty  = $item->qty - $resep->qty;
+                $item->update([
+                    'qty'  => $qty
+                ]);
+            }
+            
+        }
     }
 
     protected function getRedirectUrl(): string

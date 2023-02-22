@@ -19,7 +19,6 @@ return new class extends Migration
             $table->foreignId('menu_id')->constrained('menu');
             $table->foreignId('item_id')->constrained('items');
             $table->integer('qty');
-            $table->enum('satuan', SatuanEnum::toArray());
             $table->timestamps();
         });
     }

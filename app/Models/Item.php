@@ -17,4 +17,21 @@ class Item extends Model
     public function resep(){
         return $this->hasMany(Resep::class);
     }
+
+    static function kode_item(){
+        $number     = 1;
+        $pembelian  = static::latest()->first();
+
+        if (!empty($pembelian)) {
+            $kode   = explode("/[a-z]+./", $pembelian['kode']);
+            $number = $pembelian['kode'] + 1;
+        }
+
+        return str_pad(
+            $number,
+            '0',
+            STR_PAD_LEFT
+        );
+    }
+
 }

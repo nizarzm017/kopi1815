@@ -32,9 +32,6 @@ class ResepRelationManager extends RelationManager
                 TextInput::make('qty')
                     ->numeric()
                     ->required(),
-                Select::make('satuan')
-                    ->options(SatuanEnum::toLabels())
-                    ->required(),
             ]);
     }
 

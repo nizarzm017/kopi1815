@@ -3,10 +3,15 @@
 namespace App\Filament\Resources;
 
 use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
+use App\Enums\PembelianKategoryEnums;
 use App\Filament\Resources\ItemResource\Pages;
 use App\Filament\Resources\ItemResource\RelationManagers;
 use App\Models\Item;
+use App\Models\Pembelian;
+use Closure;
 use Filament\Forms;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -30,9 +35,25 @@ class ItemResource extends Resource
             ->schema([
                 TextInput::make('kode')
                     ->required()
+                    ->default(Item::kode_item())
                     ->unique(),
                 TextInput::make('nama')
+                    ->required(),               
+                TextInput::make('harga')
+                    ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
                     ->required(),
+                Radio::make('kategori')
+                    ->options(PembelianKategoryEnums::kategori())
+                    ->lazy()
+                    ->afterStateUpdated(function(Closure $set, $state){
+                        if($state == PembelianKategoryEnums::makanan()){
+                            return $set('kode', 'M'. Item::kode_item());
+                        }
+                        if($state == PembelianKategoryEnums::minuman()){
+                            return $set('kode', 'I'. Item::kode_item());
+                        }
+                        return $set('kode', 'B'. Item::kode_item());
+                    })
             ]);
     }
 
@@ -40,8 +61,12 @@ class ItemResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('kode'),
+                TextColumn::make('kode')
+                    ->sortable(),
                 TextColumn::make('nama'),
+                TextColumn::make('qty'),
+                TextColumn::make('harga')
+                    ->money('idr', true),
             ])
             ->filters([
                 
