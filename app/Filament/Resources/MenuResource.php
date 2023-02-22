@@ -5,12 +5,14 @@ namespace App\Filament\Resources;
 use Akaunting\Money\Money;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Enums\KategoriEnum;
+use App\Filament\Resources\ItemResource\RelationManagers\ResepRelationManager;
 use App\Filament\Resources\MenuResource\Pages;
 use App\Filament\Resources\MenuResource\RelationManagers;
 use App\Models\Menu;
+use App\Models\Resep;
 use Filament\Forms;
+use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -24,7 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
-
+    
     protected static ?string $navigationGroup = 'Data Master';
 
     protected static ?string $slug = 'menu';
@@ -40,16 +42,19 @@ class MenuResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+        ->schema([
+            Card::make()
             ->columns(1)    
             ->schema([
                 TextInput::make('nama')
-                    ->required(),
+                ->required(),
                 TextInput::make('harga')
-                    ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
-                    ->required(),
+                ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
+                ->required(),
                 Radio::make('kategori')
-                    ->options(KategoriEnum::kategori())
-                    ->required()
+                ->options(KategoriEnum::kategori())
+                ->required()
+                ])
             ]);
     }
 
@@ -89,11 +94,20 @@ class MenuResource extends Resource
                 
             ]);
     }
+        
+    public static function getRelations(): array
+    {
+        return [
+            ResepRelationManager::class
+        ];
+    }
     
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageMenus::route('/'),
+            'index' => Pages\ListMenus::route('/'),
+            'create' => Pages\CreateMenu::route('/create'),
+            'edit' => Pages\EditMenu::route('/{record}/edit'),
         ];
     }    
 }

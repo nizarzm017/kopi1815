@@ -13,4 +13,8 @@ class Item extends Model
     public function pembelian_detail(){
         return $this->hasMany(PembelianDetail::class);
     }
+
+    public function resep(){
+        return $this->hasMany(Resep::class);
+    }
 }

@@ -18,4 +18,9 @@ class Menu extends Model
     public function penjualan_detail(){
         return $this->hasMany(PenjualanDetail::class);
     }
+
+    public function resep(){
+        return $this->hasMany(Resep::class);
+    }
+    
 }

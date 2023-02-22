@@ -139,12 +139,12 @@ class PenjualanResource extends Resource
                                     }),
                                 TextInput::make('harga')
                                     ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
-                                    ->reactive()
+                                    ->lazy()
                                     ->disabled(),
                                 TextInput::make('qty')
                                     ->numeric()
                                     ->default(1)
-                                    ->reactive()
+                                    ->lazy()
                                     ->afterStateUpdated(function (Closure $set, Closure $get, $state){
                                         $subtotal = Str::slug($state * $get('harga'));
                                         $set('subtotal', $subtotal);
@@ -153,7 +153,7 @@ class PenjualanResource extends Resource
                                     ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
                                     ->reactive()
                                     ->disabled()
-                            ])    
+                            ])
                             ->createItemButtonLabel('Add Item'),
                             Card::make()
                             ->schema([
@@ -222,37 +222,36 @@ class PenjualanResource extends Resource
                             ->required()
                             ->default(0)
                             ->disabled()
-                            ->reactive()
+                            ->lazy()
                             ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
                             ->hidden(fn (Closure $get) => (int)$get('pembayaran') == Penjualan::$point),
                         Hidden::make('total')
                             ->required()
                             ->default(0)
-                            ->reactive()
+                            ->lazy()
                             ->hidden(fn (Closure $get) => (int)$get('pembayaran') != Penjualan::$point),
                         TextInput::make('bayar')
                             ->required()
                             ->default(0)
-                            ->reactive()
+                            ->lazy()
                             ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
                             ->afterStateUpdated(function (Closure $set, Closure $get, $state){
                                 $set('kembalian', Str::slug($state - $get('total')));
                             })
                             ->hidden(fn (Closure $get) => (int)$get('pembayaran') !== Penjualan::$cash)
-                            ->rules([function(Closure $get){
-                                $bayar = $get('bayar');
-                                function($state, Closure $fail) use ($bayar){
-                                if ($state < $bayar ) {
-                                    $fail("Pembayaran Kurang");
+                            ->rules([function(Closure $get, $state){
+                                return function (string $attribute, $value, Closure $fail) use ($get, $state){
+                                    $total = $get('total');
+                                        if ($state < $total ) {
+                                            $fail("Pembayaran Kurang");
+                                        }
+                                    };
                                 }
-                            };
-                            },
                             ]),
                         TextInput::make('kembalian')
                             ->required()
                             ->disabled()
-                            ->reactive()
-                            ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
+                            ->mask(fn (TextInput\Mask $mask, Closure $get) => $get('bayar') < $get('total') ? $mask->money('-Rp', '.' , 0) : $mask->money('Rp', '.' , 0))
                             ->default(0)
                             ->hidden(fn (Closure $get) => (int)$get('pembayaran') !== Penjualan::$cash),
                     ])

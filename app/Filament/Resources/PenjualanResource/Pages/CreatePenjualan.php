@@ -4,6 +4,7 @@ namespace App\Filament\Resources\PenjualanResource\Pages;
 
 use App\Filament\Resources\PenjualanResource;
 use App\Models\Penjualan;
+use App\Models\PenjualanDetail;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,6 +20,7 @@ class CreatePenjualan extends CreateRecord
         }
         return$this->getModel()::create($data);
     }
+
 
     protected function afterCreate(): void
     {
