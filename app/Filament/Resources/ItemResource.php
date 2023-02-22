@@ -35,7 +35,7 @@ class ItemResource extends Resource
             ->schema([
                 TextInput::make('kode')
                     ->required()
-                    ->default(Item::kode_item())
+                    ->default(fn(Closure $get) => 'M'.Item::kode_item(PembelianKategoryEnums::makanan()))
                     ->unique(),
                 TextInput::make('nama')
                     ->required(),               
@@ -45,14 +45,15 @@ class ItemResource extends Resource
                 Radio::make('kategori')
                     ->options(PembelianKategoryEnums::kategori())
                     ->lazy()
+                    ->default(PembelianKategoryEnums::makanan())
                     ->afterStateUpdated(function(Closure $set, $state){
                         if($state == PembelianKategoryEnums::makanan()){
-                            return $set('kode', 'M'. Item::kode_item());
+                            return $set('kode', 'M'. Item::kode_item($state));
                         }
                         if($state == PembelianKategoryEnums::minuman()){
-                            return $set('kode', 'I'. Item::kode_item());
+                            return $set('kode', 'I'. Item::kode_item($state));
                         }
-                        return $set('kode', 'B'. Item::kode_item());
+                        return $set('kode', 'B'. Item::kode_item($state));
                     })
             ]);
     }
