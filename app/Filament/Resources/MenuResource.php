@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use Akaunting\Money\Money;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Enums\KategoriEnum;
 use App\Filament\Resources\MenuResource\Pages;
 use App\Filament\Resources\MenuResource\RelationManagers;
@@ -24,6 +25,8 @@ class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
 
+    protected static ?string $navigationGroup = 'Data Master';
+
     protected static ?string $slug = 'menu';
     
     protected static ?string $label = 'Menu';
@@ -32,7 +35,7 @@ class MenuResource extends Resource
 
     protected static ?string $navigationLabel = 'Menu';
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'bx-food-menu';
 
     public static function form(Form $form): Form
     {
@@ -46,6 +49,7 @@ class MenuResource extends Resource
                     ->required(),
                 Radio::make('kategori')
                     ->options(KategoriEnum::kategori())
+                    ->required()
             ]);
     }
 
@@ -63,12 +67,18 @@ class MenuResource extends Resource
                         fn($state) => ucfirst($state->value)
                     )
                     ->colors([
-                        'danger' => KategoriEnum::minuman(),
+                        'success' => KategoriEnum::minuman(),
                         'primary' => KategoriEnum::makanan(),
                     ])
             ])
             ->filters([
                 //
+            ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('Cetak Laporan')
+                    ->extraViewData([
+                        'title' => 'Menu'
+                    ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -76,6 +86,7 @@ class MenuResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
+                
             ]);
     }
     

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\PegawaiResource\Pages;
 use App\Filament\Resources\PegawaiResource\RelationManagers;
 use App\Models\Pegawai;
@@ -24,13 +25,15 @@ class PegawaiResource extends Resource
 
     protected static ?string $slug = 'pegawai';
     
+    protected static ?string $navigationGroup = 'Data Master';
+
     protected static ?string $label = 'Pegawai';
 
     protected static ?string $pluralLabel = 'Pegawai';
 
     protected static ?string $navigationLabel = 'Pegawai';
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'healthicons-f-city-worker';
 
     public static function form(Form $form): Form
     {
@@ -42,7 +45,7 @@ class PegawaiResource extends Resource
                 DatePicker::make('tanggal_lahir')->required(),
                 Select::make('agama')->options(Pegawai::$agama)->required(),
                 Textarea::make('alamat')->required(),
-                TextInput::make('no_hp')->required(),
+                TextInput::make('no_hp')->required()->numeric(),
                 Select::make('status_perkawinan')->options(Pegawai::$status_perkawinan)->required(),
                 Select::make('jabatan')->options(pegawai::$jabatan)->required(),
                 DatePicker::make('mulai_bekerja')->required()
@@ -57,11 +60,17 @@ class PegawaiResource extends Resource
                 TextColumn::make('nama'),
                 TextColumn::make('jenis_kelamin')->enum(Pegawai::$jenis_kelamin),
                 TextColumn::make('no_hp'),
-                TextColumn::make('jabatan'),
+                TextColumn::make('jabatan')->enum(Pegawai::$jabatan),
                 TextColumn::make('mulai_bekerja')
             ])
             ->filters([
-                //
+
+            ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('Cetak Laporan')
+                    ->extraViewData([
+                        'title' => 'Pegawai'
+                    ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

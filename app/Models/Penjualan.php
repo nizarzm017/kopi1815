@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -32,7 +33,7 @@ class Penjualan extends Model
     }
 
     public function member_point(){
-        return $this->belongsTo(MemberPoint::class);
+        return $this->hasOne(MemberPoint::class);
     }
 
     public function penjualan_detail(){
@@ -84,8 +85,37 @@ class Penjualan extends Model
         return str_pad(
          $number , 5, '0' , STR_PAD_LEFT
         );
-        
+    }
 
+    static function getSumByDate() {
+        $month  = date('m');
+        $year   = date('Y');
+        $query  = self::select('id')->whereMonth('created_at', $month)->whereYear('created_at', $year);
+        return $query;
+    }
+
+    static function getTransaksiByDate() {
+        $month  = date('m');
+        $year   = date('Y');
+        $query  = self::select('*')->whereMonth('created_at', $month)->whereYear('created_at', $year);
+        return $query;
+    }
+
+    static function getBestSeller(){
+        $today      = Carbon::now();
+        $firstDay   = Carbon::now()->firstOfMonth();
+        $query      = PenjualanDetail::whereBetween('created_at', [$firstDay, $today])->selectRaw('id, menu_id, count(qty) as jumlah')->groupBy('menu_id');
+        return $query;
+    }
+
+    static function getAllBestSeller(){
+        $query      = PenjualanDetail::selectRaw('id, menu_id, count(qty) as jumlah')->groupBy('menu_id');
+        return $query;
+    }
+
+    static function getTotalPenjualan($dari, $sampai){
+        $query = self::whereBetween('created_at', [$dari, $sampai])->sum('total');
+        return $query;
     }
 
 }

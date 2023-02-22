@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\PembelianResource\Pages;
 use App\Filament\Resources\PembelianResource\RelationManagers;
 use App\Models\Item;
@@ -24,6 +25,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -37,9 +39,11 @@ class PembelianResource extends Resource
 
     protected static ?string $pluralLabel = 'Pembelian';
 
+    protected static ?string $navigationGroup = 'Transaksi';
+
     protected static ?string $navigationLabel = 'Pembelian';
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'tabler-shopping-cart-plus';
 
     public static function form(Form $form): Form
     {
@@ -75,14 +79,10 @@ class PembelianResource extends Resource
                                             ->searchable()
                                             ->preload()
                                             ->required()
-                                            ->reactive()
-                                            ->afterStateUpdated(function (Closure $set, $state){
-                                                $set('harga', Str::slug(Item::find($state)->harga));
-                                                $set('subtotal', Str::slug(Item::find($state)->harga));
-                                            }),
+                                            ->reactive(),
                                         TextInput::make('harga')
                                             ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
-                                            ->reactive()
+                                            ->lazy()
                                             ->afterStateUpdated(function (Closure $set, Closure $get, $state){
                                                 $subtotal = Str::slug($state * $get('qty'));
                                                 $set('subtotal', $subtotal);
@@ -92,14 +92,14 @@ class PembelianResource extends Resource
                                             ->numeric()
                                             ->required()
                                             ->default(1)
-                                            ->reactive()
+                                            ->lazy()
                                             ->afterStateUpdated(function (Closure $set, Closure $get, $state){
                                                 $subtotal = Str::slug($state * $get('harga'));
                                                 $set('subtotal', $subtotal);
                                             }),
                                         TextInput::make('subtotal')
                                             ->mask(fn (TextInput\Mask $mask) => $mask->money('Rp', '.' , 0))
-                                            ->reactive()
+                                            ->lazy()
                                             ->disabled()
                                     ])    
                                     ->createItemButtonLabel('Add Item'),
@@ -125,13 +125,41 @@ class PembelianResource extends Resource
     {
         return $table
             ->columns([
+
                 TextColumn::make('no_transaksi'),
+
+                TextColumn::make('no_transaksi')
+                    ->sortable(),
+                TextColumn::make('user.name'),
+
                 TextColumn::make('tanggal'),
                 TextColumn::make('pembelian_detail_sum_qty')->sum('pembelian_detail', 'qty')->label("Kuantitas"),
                 TextColumn::make('total')
             ])
+            ->defaultSort('no_transaksi', 'desc')
             ->filters([
-                //
+                Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from')->label('Dari'),
+                        Forms\Components\DatePicker::make('created_until')->label('Sampai'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
+            ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('Cetak Laporan')
+                    ->extraViewData([
+                        'title' => 'Pembelian'
+                    ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -155,5 +183,7 @@ class PembelianResource extends Resource
             'create' => Pages\CreatePembelian::route('/create'),
             'edit' => Pages\EditPembelian::route('/{record}/edit'),
         ];
-    }    
+    }  
+    
+
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\ItemResource\Pages;
 use App\Filament\Resources\ItemResource\RelationManagers;
 use App\Models\Item;
@@ -19,14 +20,19 @@ class ItemResource extends Resource
 {
     protected static ?string $model = Item::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationGroup = 'Data Master';
+
+    protected static ?string $navigationIcon = 'bx-shopping-bag';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('kode'),
-                TextInput::make('nama'),
+                TextInput::make('kode')
+                    ->required()
+                    ->unique(),
+                TextInput::make('nama')
+                    ->required(),
             ]);
     }
 
@@ -38,7 +44,13 @@ class ItemResource extends Resource
                 TextColumn::make('nama'),
             ])
             ->filters([
-                //
+                
+            ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('Cetak Laporan')
+                    ->extraViewData([
+                        'title' => 'Item'
+                    ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

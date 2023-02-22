@@ -10,7 +10,7 @@
         <title>{{ config('app.name') }}</title>
  
         <style>[x-cloak] { display: none !important; }</style>
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite(['resources/css/filament.css', 'resources/js/app.js'])
         @livewireStyles
         @livewireScripts
         @stack('scripts')

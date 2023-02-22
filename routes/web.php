@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Livewire\CetakLabaRugi;
+use App\Http\Livewire\Nota;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +15,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+Route::get('penjualan/nota/{penjualan}', Nota::class)->name('nota');
+Route::post('cetaklabarugi', CetakLabaRugi::class)->name('laba-rugi');
+
+// Route::redirect('/login', '/admin/login')->name('login');
+

@@ -47,4 +47,9 @@ class Pembelian extends Model
             STR_PAD_LEFT
         );
     }
+
+    static function getTotalPembelian($dari, $sampai){
+        $query = self::whereBetween('created_at', [$dari, $sampai])->sum('total');
+        return $query;
+    }
 }
